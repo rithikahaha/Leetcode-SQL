@@ -17,7 +17,7 @@ Find the names of customers who are either:
 | name | varchar |
 | referee_id | int |
 
-## SQL
+## Solution 1: Using `OR` and `IS NULL`
 
 ```sql
 SELECT name
@@ -26,11 +26,31 @@ WHERE referee_id != 2
 OR referee_id IS NULL;
 ```
 
-## Explanation
+### Explanation
 
-Use the `WHERE` clause to filter customers who:
+The `WHERE` clause filters customers who:
 
 - Have a `referee_id` other than `2`.
 - Have no referee (`NULL`).
 
-The `OR referee_id IS NULL` condition is necessary because `NULL` values are not returned by the condition `referee_id != 2`.
+The `OR referee_id IS NULL` condition is required because comparisons involving `NULL` (such as `NULL != 2`) evaluate to `UNKNOWN`, not `TRUE`. Therefore, rows with `NULL` values must be handled explicitly.
+
+---
+
+## Solution 2: Using `IFNULL()`
+
+```sql
+SELECT name
+FROM Customer
+WHERE IFNULL(referee_id, 0) != 2;
+```
+
+### Explanation
+
+The `IFNULL()` function replaces `NULL` values with `0`.
+
+- If `referee_id` is `NULL`, it becomes `0`, and since `0 != 2`, the customer is included.
+- If `referee_id` is any value other than `2`, the customer is included.
+- If `referee_id` is `2`, the condition evaluates to `FALSE`, so the customer is excluded.
+
+Using `IFNULL()` provides a concise way to handle `NULL` values without writing a separate `OR referee_id IS NULL` condition.
