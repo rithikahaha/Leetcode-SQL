@@ -1,52 +1,37 @@
-# Histogram of Tweets
+# 1757. Recyclable and Low Fat Products
 
-**Company:** Twitter
 **Difficulty:** Easy
 
 ## Problem
 
-Assume you're given a table of Twitter tweet data. Write a query to obtain a
-histogram of tweets posted per user in 2022.
+Find the IDs of products that are both low fat and recyclable.
 
-Output the tweet count per user as the **bucket**, and the number of Twitter
-users who fall into that bucket.
+### Table: Products
 
-In other words: group the users by the number of tweets they posted in 2022,
-and count the number of users in each group.
+| Column | Type | Description |
+|--------|------|-------------|
+| product_id | int | Primary key |
+| low_fats | enum ('Y', 'N') | Whether the product is low fat |
+| recyclable | enum ('Y', 'N') | Whether the product is recyclable |
 
-## Schema
+---
 
-**`tweets`**
+## Solution
 
-| Column Name  | Type      |
-|--------------|-----------|
-| tweet_id     | integer   |
-| user_id      | integer   |
-| msg          | string    |
-| tweet_date   | timestamp |
+```sql
+SELECT product_id
+FROM Products
+WHERE low_fats = 'Y'
+  AND recyclable = 'Y';
+```
 
-## Example Input
+---
 
-**`tweets`**
+## Explanation
 
-| tweet_id | user_id | msg                                                                  | tweet_date          |
-|----------|---------|-----------------------------------------------------------------------|----------------------|
-| 214252   | 111     | Am considering taking Tesla private at $420. Funding secured.        | 12/30/2021 00:00:00 |
-| 739252   | 111     | Despite the constant negative press covfefe                          | 01/01/2022 00:00:00 |
-| 846402   | 111     | Following @NickSinghTech on Twitter changed my life!                 | 02/14/2022 00:00:00 |
-| 241425   | 254     | If the salary is so competitive why won't you tell me what it is?    | 03/01/2022 00:00:00 |
-| 231574   | 148     | I no longer have a manager. I can't be managed                       | 03/23/2022 00:00:00 |
+Filter the `Products` table to return only rows where:
 
-## Example Output
+- `low_fats = 'Y'`
+- `recyclable = 'Y'`
 
-| tweet_bucket | users_num |
-|--------------|-----------|
-| 1            | 2         |
-| 2            | 1         |
-
-**Explanation:** There are two users who posted only one tweet in 2022, and
-one user who posted two tweets in 2022. The query groups users by how many
-tweets they posted, then counts how many users fall into each group.
-
-> Note: the dataset you're querying against may have different input/output —
-> this is just an example.
+The `AND` operator ensures both conditions are satisfied.
