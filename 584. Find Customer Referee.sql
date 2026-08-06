@@ -54,3 +54,21 @@ The `IFNULL()` function replaces `NULL` values with `0`.
 - If `referee_id` is `2`, the condition evaluates to `FALSE`, so the customer is excluded.
 
 Using `IFNULL()` provides a concise way to handle `NULL` values without writing a separate `OR referee_id IS NULL` condition.
+
+## Solution 3: Using `COALESCE()`
+
+```sql
+SELECT name
+FROM Customer
+WHERE COALESCE(referee_id, 0) != 2;
+```
+
+### Explanation
+
+The `COALESCE()` function returns the first non-`NULL` value from the list of arguments.
+
+- If `referee_id` is `NULL`, `COALESCE(referee_id, 0)` returns `0`, and since `0 != 2`, the customer is included.
+- If `referee_id` has a value other than `2`, that value is returned, and the customer is included.
+- If `referee_id` is `2`, the condition evaluates to `FALSE`, so the customer is excluded.
+
+`COALESCE()` is part of the SQL standard and is supported by most relational database systems, making it more portable than `IFNULL()`, which is specific to MySQL.
