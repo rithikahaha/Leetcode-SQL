@@ -25,7 +25,7 @@ Return the original three lengths along with `triangle`, which should be:
 
 ---
 
-## Solution: `CASE WHEN`
+## Solution 1: `CASE WHEN`
 
 ```sql
 SELECT x,
@@ -45,17 +45,9 @@ FROM Triangle;
 
 The key to this problem is the **triangle inequality**.
 
-Three positive line segments can form a triangle only if:
+Three line segments can form a triangle only if the sum of **any two sides is greater than the third side**.
 
-> The sum of any two sides is greater than the third side.
-
-So we need to check **all three possible combinations**.
-
----
-
-## Step 1: Understand the Triangle Inequality
-
-For three sides `x`, `y`, and `z`, we need:
+So we need to check all three possible combinations:
 
 ```text
 x + y > z
@@ -65,60 +57,17 @@ y + z > x
 
 All three conditions must be true.
 
-Why?
-
-Imagine the longest side is `z`.
-
-If:
-
-```text
-x + y <= z
-```
-
-then the two shorter sides are not long enough to meet and close the shape.
-
-For example:
-
-```text
-x = 13
-y = 15
-z = 30
-```
-
-Check:
-
-```text
-13 + 15 > 30
-28 > 30
-```
-
-This is false.
-
-Therefore, these segments cannot form a triangle.
-
-The answer is:
-
-```text
-No
-```
-
 ---
 
-## Step 2: Check All Three Conditions
+### Step 1: Understand the Triangle Inequality
 
-We use:
+For three sides `x`, `y`, and `z`, we need:
 
-```sql
+```text
 x + y > z
-AND x + z > y
-AND y + z > x
+x + z > y
+y + z > x
 ```
-
-The `AND` is important.
-
-We don't just need **one** of the conditions to be true.
-
-We need **every** condition to be true.
 
 For example:
 
@@ -136,29 +85,54 @@ Check:
 20 + 15 > 10  → TRUE
 ```
 
-All three are true, so:
+All three conditions are true, so these sides can form a triangle.
+
+The answer is:
 
 ```text
 Yes
 ```
 
+Now consider:
+
+```text
+x = 13
+y = 15
+z = 30
+```
+
+Check:
+
+```text
+13 + 15 > 30
+28 > 30 → FALSE
+```
+
+Since one condition is false, the three sides cannot form a triangle.
+
+The answer is:
+
+```text
+No
+```
+
 ---
 
-## Step 3: Use `CASE`
+### Step 2: Use `CASE`
 
 We need to output either `'Yes'` or `'No'` depending on whether the conditions are satisfied.
 
-This is exactly what `CASE` is designed for.
+This is what `CASE` is designed for:
 
 ```sql
 CASE
     WHEN condition
     THEN 'Yes'
     ELSE 'No'
-END AS triangle
+END
 ```
 
-Think of it as:
+It works like:
 
 ```text
 IF condition is true
@@ -167,7 +141,7 @@ ELSE
     → No
 ```
 
-So our condition becomes:
+So we write:
 
 ```sql
 CASE
@@ -181,40 +155,7 @@ END AS triangle
 
 ---
 
-## Why `CASE` instead of `WHERE`?
-
-We are **not filtering rows out**.
-
-The problem asks us to report **every row** and simply classify each row as `'Yes'` or `'No'`.
-
-Therefore, we should not use:
-
-```sql
-WHERE ...
-```
-
-because `WHERE` would remove rows that don't satisfy the condition.
-
-Instead, we use `CASE` to create a new column:
-
-```text
-triangle
-```
-
-For example:
-
-|  x |  y |  z | triangle |
-| -: | -: | -: | -------- |
-| 13 | 15 | 30 | No       |
-| 10 | 20 | 15 | Yes      |
-
-Both rows remain in the result.
-
----
-
-## Why `AND` instead of `OR`?
-
-This is another important detail.
+### Why `AND` instead of `OR`?
 
 We need:
 
@@ -232,32 +173,19 @@ OR x + z > y
 OR y + z > x
 ```
 
-`OR` would incorrectly allow a row where only one or two conditions are true.
+`AND` means **every condition must be true**.
 
-For a triangle, **all three conditions must be satisfied**.
+`OR` means **at least one condition must be true**.
 
-So:
-
-```text
-AND → every condition must be true
-OR  → at least one condition must be true
-```
-
-Here we need `AND`.
+For a valid triangle, all three conditions must be satisfied.
 
 ---
 
-## Why is the condition `>` and not `>=`?
+### Why `>` instead of `>=`?
 
-The rule is:
+The condition must use `>` rather than `>=`.
 
-```text
-sum of two sides > third side
-```
-
-It must be **strictly greater**.
-
-Consider:
+For example:
 
 ```text
 x = 3
@@ -265,13 +193,13 @@ y = 4
 z = 7
 ```
 
-We get:
+Here:
 
 ```text
 3 + 4 = 7
 ```
 
-The sides cannot form a proper triangle because they would lie in a straight line rather than creating a closed triangle.
+The sides would form a straight line rather than a proper triangle.
 
 Therefore:
 
@@ -287,51 +215,69 @@ Using:
 x + y >= z
 ```
 
-would incorrectly classify this case as a triangle.
+would incorrectly classify this as a triangle.
 
 ---
 
-## Breaking Down the Full Query
+## Solution 2: `IF()`
+
+MySQL also provides the `IF()` function, which is useful when there are only **two possible outcomes**.
 
 ```sql
 SELECT x,
        y,
        z,
-       CASE
-           WHEN x + y > z
-            AND x + z > y
-            AND y + z > x
-           THEN 'Yes'
-           ELSE 'No'
-       END AS triangle
+       IF(
+           x + y > z
+           AND x + z > y
+           AND y + z > x,
+           'Yes',
+           'No'
+       ) AS triangle
 FROM Triangle;
 ```
 
-Let's read it piece by piece.
+### Explanation
 
-### Select the original sides
-
-```sql
-SELECT x,
-       y,
-       z
-```
-
-We need to return the three original side lengths.
-
-### Create the result column
+`IF()` in MySQL follows this structure:
 
 ```sql
-CASE
-    WHEN ...
-    THEN 'Yes'
-    ELSE 'No'
-END AS triangle
+IF(condition, value_if_true, value_if_false)
 ```
 
-This creates a new column called `triangle`.
+You can think of it as:
 
-### Check the triangle inequality
+```text
+IF(condition)
+    → return value_if_true
+ELSE
+    → return value_if_false
+```
+
+For this problem:
+
+```sql
+IF(
+    condition,
+    'Yes',
+    'No'
+)
+```
+
+means:
+
+```text
+IF the sides can form a triangle
+    → return 'Yes'
+ELSE
+    → return 'No'
+```
+
+---
+
+### Step 1: Write the condition
+
+The condition is exactly the same as in the `CASE` solution:
 
 ```sql
 x + y > z
@@ -339,15 +285,218 @@ AND x + z > y
 AND y + z > x
 ```
 
-This determines whether the three lengths can form a triangle.
+This checks the triangle inequality.
 
-### Read from the table
+---
+
+### Step 2: Put the condition inside `IF()`
+
+The general structure is:
 
 ```sql
-FROM Triangle
+IF(
+    condition,
+    'Yes',
+    'No'
+)
 ```
 
-We perform this calculation for every row in the table.
+So:
+
+```sql
+IF(
+    x + y > z
+    AND x + z > y
+    AND y + z > x,
+    'Yes',
+    'No'
+)
+```
+
+The three arguments are:
+
+```text
+1st argument → condition
+2nd argument → what to return if TRUE
+3rd argument → what to return if FALSE
+```
+
+Specifically:
+
+```text
+condition
+    ↓
+x + y > z
+AND x + z > y
+AND y + z > x
+
+TRUE
+    ↓
+'Yes'
+
+FALSE
+    ↓
+'No'
+```
+
+---
+
+## `CASE WHEN` vs `IF()`
+
+Both solutions produce the same result.
+
+### `IF()`
+
+```sql
+IF(condition, 'Yes', 'No')
+```
+
+This is shorter and convenient when there are only two possible outcomes.
+
+### `CASE`
+
+```sql
+CASE
+    WHEN condition THEN 'Yes'
+    ELSE 'No'
+END
+```
+
+`CASE` is more flexible when there are multiple conditions or multiple possible outputs.
+
+For example:
+
+```sql
+CASE
+    WHEN score >= 90 THEN 'A'
+    WHEN score >= 80 THEN 'B'
+    WHEN score >= 70 THEN 'C'
+    ELSE 'F'
+END
+```
+
+That would be much harder to express cleanly with nested `IF()` statements.
+
+For this particular problem, however, both are perfectly reasonable.
+
+---
+
+## Why `IF()` works well for this problem
+
+The question only has two possible results:
+
+```text
+Yes
+No
+```
+
+So the logic naturally fits:
+
+```sql
+IF(condition, 'Yes', 'No')
+```
+
+This makes the `IF()` version particularly concise:
+
+```sql
+SELECT x,
+       y,
+       z,
+       IF(
+           x + y > z
+           AND x + z > y
+           AND y + z > x,
+           'Yes',
+           'No'
+       ) AS triangle
+FROM Triangle;
+```
+
+---
+
+## Why not use `WHERE`?
+
+We should **not** write:
+
+```sql
+WHERE x + y > z
+  AND x + z > y
+  AND y + z > x
+```
+
+because `WHERE` would remove the rows that do not form triangles.
+
+The problem asks us to report **every row**, while simply labeling each one as `'Yes'` or `'No'`.
+
+For example:
+
+|  x |  y |  z |
+| -: | -: | -: |
+| 13 | 15 | 30 |
+| 10 | 20 | 15 |
+
+We need:
+
+|  x |  y |  z | triangle |
+| -: | -: | -: | -------- |
+| 13 | 15 | 30 | No       |
+| 10 | 20 | 15 | Yes      |
+
+The invalid triangle still needs to appear.
+
+Therefore, we use `IF()` or `CASE` to **create a result column**, rather than `WHERE` to filter rows.
+
+---
+
+## Breaking Down the `IF()` Query
+
+```sql
+SELECT x,
+       y,
+       z,
+       IF(
+           x + y > z
+           AND x + z > y
+           AND y + z > x,
+           'Yes',
+           'No'
+       ) AS triangle
+FROM Triangle;
+```
+
+Think about it in this order:
+
+### 1. Return the original side lengths
+
+```sql
+SELECT x, y, z
+```
+
+### 2. Check whether they form a triangle
+
+```sql
+x + y > z
+AND x + z > y
+AND y + z > x
+```
+
+### 3. If true, return `'Yes'`
+
+```sql
+'Yes'
+```
+
+### 4. If false, return `'No'`
+
+```sql
+'No'
+```
+
+### 5. Give the calculated column a name
+
+```sql
+AS triangle
+```
 
 ---
 
@@ -368,17 +517,23 @@ y = 15
 z = 30
 ```
 
-Check:
+The condition becomes:
 
 ```text
 13 + 15 > 30
 28 > 30 → FALSE
 ```
 
-Since one condition is false:
+Therefore:
 
 ```text
-triangle = No
+IF(FALSE, 'Yes', 'No')
+```
+
+returns:
+
+```text
+No
 ```
 
 ---
@@ -391,7 +546,7 @@ y = 20
 z = 15
 ```
 
-Check:
+The condition becomes:
 
 ```text
 10 + 20 > 15 → TRUE
@@ -399,13 +554,19 @@ Check:
 20 + 15 > 10 → TRUE
 ```
 
-All conditions are true:
+Therefore:
 
 ```text
-triangle = Yes
+IF(TRUE, 'Yes', 'No')
 ```
 
-So the final result is:
+returns:
+
+```text
+Yes
+```
+
+Final result:
 
 |  x |  y |  z | triangle |
 | -: | -: | -: | -------- |
@@ -414,68 +575,55 @@ So the final result is:
 
 ---
 
-## A Useful Alternative: Check the Largest Side Only
-
-Mathematically, we can also check whether the **largest side** is smaller than the sum of the other two sides.
-
-For example, if `z` is the largest:
-
-```text
-x + y > z
-```
-
-But since we don't know which of `x`, `y`, or `z` is largest, we'd need to use `GREATEST()` and `SUM`-like logic.
-
-For this problem, explicitly checking all three conditions is much simpler and easier to understand:
-
-```sql
-x + y > z
-AND x + z > y
-AND y + z > x
-```
-
----
-
 ## Key Takeaway
 
-When a SQL problem asks you to **classify each row** based on a condition, think about:
+When a SQL problem asks you to **classify every row** based on a condition, two useful options are:
+
+### `IF()`
+
+```sql
+IF(condition, value_if_true, value_if_false)
+```
+
+Use this when there are two straightforward outcomes.
+
+### `CASE`
 
 ```sql
 CASE
-    WHEN condition
-    THEN 'Yes'
-    ELSE 'No'
+    WHEN condition THEN value
+    ELSE value
 END
 ```
 
-For the Triangle Judgement problem, the condition is the triangle inequality:
+Use this when you have multiple conditions or more complex logic.
 
-```text
-x + y > z
-AND
-x + z > y
-AND
-y + z > x
-```
-
-So the general pattern is:
+For this problem:
 
 ```sql
-SELECT ...,
-       CASE
-           WHEN condition1
-            AND condition2
-            AND condition3
-           THEN 'Yes'
-           ELSE 'No'
-       END AS result
-FROM table;
+IF(
+    x + y > z
+    AND x + z > y
+    AND y + z > x,
+    'Yes',
+    'No'
+)
 ```
 
-The important concepts here are:
+means:
 
-* **Triangle inequality** → determines whether three lengths form a triangle.
-* `CASE WHEN` → creates a conditional result for every row.
-* `AND` → requires all three conditions to be true.
-* `>` → must be strictly greater; equality does not form a triangle.
-* `WHERE` is not appropriate because we need to keep **both** valid and invalid rows.
+```text
+IF all three triangle conditions are true
+    → Yes
+ELSE
+    → No
+```
+
+The main concepts to remember are:
+
+* **Triangle inequality** → the sum of any two sides must be greater than the third.
+* `IF()` → returns one value when a condition is true and another when it is false.
+* `CASE WHEN` → another way to implement conditional logic.
+* `AND` → all three triangle conditions must be true.
+* `>` → equality does not form a proper triangle.
+* `WHERE` → should not be used because we need to keep both `'Yes'` and `'No'` rows.
