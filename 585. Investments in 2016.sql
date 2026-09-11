@@ -29,7 +29,6 @@ Finally, round the total `tiv_2016` to **2 decimal places**.
 
 # Solution 1: `GROUP BY` + `HAVING` + `IN`
 
-```sql id="v7m3qp"
 SELECT ROUND(SUM(tiv_2016), 2) AS tiv_2016
 FROM Insurance
 WHERE tiv_2015 IN (
@@ -44,7 +43,6 @@ AND (lat, lon) IN (
     GROUP BY lat, lon
     HAVING COUNT(*) = 1
 );
-```
 
 ### Explanation
 
