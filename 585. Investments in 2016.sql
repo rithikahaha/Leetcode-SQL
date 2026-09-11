@@ -66,12 +66,10 @@ Then we sum the `tiv_2016` values of the rows that satisfy both.
 
 # Part 1: Find `tiv_2015` Values That Are Repeated
 
-```sql id="3c8p7k"
 SELECT tiv_2015
 FROM Insurance
 GROUP BY tiv_2015
 HAVING COUNT(*) > 1;
-```
 
 ### Why `GROUP BY tiv_2015`?
 
