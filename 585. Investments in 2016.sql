@@ -83,10 +83,8 @@ For the example:
 |       20 |                       1 |
 
 So we group by:
-
-```sql id="9h1m4e"
+    
 GROUP BY tiv_2015
-```
 
 This creates one group for each distinct `tiv_2015` value.
 
