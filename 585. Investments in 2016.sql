@@ -52,7 +52,6 @@ We can solve each condition separately and then combine them with `AND`.
 
 Think of it as:
 
-```text id="y8l3av"
 Condition 1:
 tiv_2015 must appear more than once
 
@@ -60,7 +59,6 @@ AND
 
 Condition 2:
 (lat, lon) must appear exactly once
-```
 
 Then we sum the `tiv_2016` values of the rows that satisfy both.
 
