@@ -58,10 +58,8 @@ The main challenge in this problem is that a person's ID can appear in **two dif
 
 For example:
 
-```text
 requester_id = 1
 accepter_id = 3
-```
 
 means:
 
