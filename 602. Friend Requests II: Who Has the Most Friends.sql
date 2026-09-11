@@ -38,7 +38,6 @@ This means the same pair of people cannot appear more than once.
 
 # Solution 1: `UNION ALL` + `GROUP BY` + `ORDER BY`
 
-```sql id="q4s8nm"
 SELECT id, COUNT(*) AS num
 FROM (
     SELECT requester_id AS id
@@ -52,7 +51,6 @@ FROM (
 GROUP BY id
 ORDER BY num DESC
 LIMIT 1;
-```
 
 ### Explanation
 
