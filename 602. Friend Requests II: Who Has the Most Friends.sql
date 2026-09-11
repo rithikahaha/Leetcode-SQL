@@ -28,13 +28,10 @@ The test cases guarantee that **only one person has the maximum number of friend
 
 The primary key is:
 
-```text id="a9k8vx"
 (requester_id, accepter_id)
-```
 
 This means the same pair of people cannot appear more than once.
 
----
 
 # Solution 1: `UNION ALL` + `GROUP BY` + `ORDER BY`
 
