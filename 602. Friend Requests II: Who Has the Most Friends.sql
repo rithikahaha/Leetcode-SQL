@@ -93,13 +93,10 @@ From the example:
 
 We rename it:
 
-```sql id="1svh9b"
 requester_id AS id
-```
 
 because eventually we want one column called `id`.
 
----
 
 ## Step 2: Get All Accepters
 
